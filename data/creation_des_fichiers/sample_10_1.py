@@ -7,23 +7,12 @@ import csv
 
 # Lecture du fichier CSV compressé directement dans un DataFrame
 data = pd.read_csv('data/data.csv.gz', compression='gzip')
-data.set_index('Unnamed: 0', inplace=True)
-
 
 # On réduit le df 
-data_reduced = data.sample(n=10, axis=1)
+data_reduced = data[["Unnamed: 0"]].join(data.sample(n=10, axis=1))
 labels = pd.read_csv('data/labels.csv')
-data_reduced['labels']= labels['Class']
 
-sample_10_1 = data_reduced.to_csv("data\sample_10_1", sep=",")
-#print(data_reduced.shape)  # Doit afficher (801, 30)
+df_merged = pd.merge(data_reduced, labels, on="Unnamed: 0", how="inner")  
+df_merged.set_index('Unnamed: 0', inplace=True)
 
-# Heatmap
-#plt.figure(figsize=(12, 8))
-#sns.heatmap(data_reduced, cmap='viridis')
-#plt.title('Heatmap des expressions géniques')
-#plt.show()
-
-
-
-#fulldf.head()
+sample_10_1 = df_merged.to_csv("data/sample_10_1.csv", sep=",")
